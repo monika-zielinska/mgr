@@ -4,23 +4,21 @@ import java.util.Scanner;
 
 public class Main {
 
-	public static void main(String[] args) {
-		
+	private int[][] tab;
+	private int n;
+	
+	public void loadData() {
 		//licba linijek
 		Scanner in = new Scanner(System.in);
 		System.out.println("Podaj liczbę linijek");
-		int n;
 		n = in.nextInt();
 		System.out.println("Liczba linijek: " + n);
 		
 		//tablica
-		
-		int[][] tab;
-		tab = new int[10][2];
+		tab = new int[n][2];
 		
 		//pętla
 		for(int i=0; i< n; i++){
-			
 			System.out.println("Podaj liczbę a");
 			int a;
 			a = in.nextInt();
@@ -31,13 +29,19 @@ public class Main {
 			
 			tab[i][0]=a;
 			tab[i][1]=b;	
-			
 		} //for
-		
+	}//public void load
+	
+	public void printData() {
 		//wypisywanie tablicy na ekran
 		for(int i=0; i< n; i++){ // przejdz po wierszach
 			System.out.println("Linijka " + i + ": " + tab[i][0] + " " + tab[i][1]);
 		}//for
-		
-	}//public static void main
+	}//public void print
+	
+	public static void main(String[] args) {
+		Main program = new Main();
+		program.loadData();
+		program.printData();
+	}
 }//public class Main	

@@ -1,6 +1,5 @@
 package mgr;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -10,7 +9,7 @@ public class Main {
 	private int[] wybrane;
 	
 	public void loadData() {
-		//licba linijek
+		//liczba linijek
 		Scanner in = new Scanner(System.in);
 		System.out.println("Podaj liczbę linijek");
 		n = in.nextInt();
@@ -22,16 +21,12 @@ public class Main {
 		
 		//pętla
 		for(int i=0; i< n; i++){
-			System.out.println("Podaj liczbę a");
-			int a;
-			a = in.nextInt();
-			
-			System.out.println("Podaj liczbę b");
-			int b;
-			b = in.nextInt();
+			System.out.println("Podaj liczbę a i b");
+            int a = in.nextInt();
+            int b = in.nextInt();
 			
 			tab[i][0]=a;
-			tab[i][1]=b;	
+			tab[i][1]=-b;	
 		} //for
 	}//public void load
 	
@@ -42,23 +37,29 @@ public class Main {
 		}//for
 	}//public void print
 	
+	
 	public void wybierzLiczby(int i){ // wybierz liczbe z linijki i
 		if(i<n){
 			// wybierz pierwsza z i-tej linijki (tab[i][0])
 			wybrane[i] = tab[i][0];
 			wybierzLiczby(i+1);
 			// wybierz druga z i-tej linijki (tab[i][1])
-			// ...
+			wybrane[i] = tab[i][1];
+			wybierzLiczby(i+1);
 		} else{
-			System.out.println("Wybrane liczby:... ");
-			// trzeba wypisac wybrane
-		}
-	}
+            for(i=0; i<n; i++){
+                System.out.print(wybrane[i]+ " ");
+			}//for
+			System.out.println();
+		}//else
+	}//public void wybierzLiczby
 	
 	public static void main(String[] args) {
 		Main program = new Main();
 		program.loadData();
 		program.printData();
+		System.out.println("Wybrane liczby:");
 		program.wybierzLiczby(0);
-	}
+		
+	}//public static void main
 }//public class Main	

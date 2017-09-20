@@ -1,6 +1,6 @@
 package mgr;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -9,7 +9,8 @@ public class Main {
     private int n, t;
     private int[][] tab;
     private int[] wybrane;
-    private boolean[] powt = new boolean[2000];
+    private final boolean[] powt = new boolean[2000];
+    private final HashSet<HashSet<Integer>> zbiorWybranych = new HashSet<>();
 
     //init
     public void initData() {
@@ -23,16 +24,15 @@ public class Main {
     public void loadData() {
         //liczba linijek
         Scanner in = new Scanner(System.in);
-        System.out.println("Podaj liczbę linijek");
+        System.out.println("Podaj liczbę implikacji");
         n = in.nextInt();
-        System.out.println("Liczba linijek: " + n);
 
         //tablica
         tab = new int[n][2];
 
         //pętla
         for (int i = 0; i < n; i++) {
-            System.out.println("Podaj liczbę a i b");
+            System.out.println("Podaj liczby a i b");
             int a = in.nextInt();
             int b = in.nextInt();
 
@@ -70,19 +70,24 @@ public class Main {
     }//public void random
 
     public void printData() {
+        System.out.println("Implikacje:");
+        System.out.println(n);
         //wypisywanie tablicy na ekran
         for (int i = 0; i < n; i++) { // przejdz po wierszach
-            System.out.println("Linijka " + i + ": " + tab[i][0] + " " + tab[i][1]);
+            System.out.println(tab[i][0] + " " + -tab[i][1]);
         }//for
     }//public void print
 
     public void wybierzLiczby(int i) { // wybierz liczbe z linijki i
         if (i < n) {
+            boolean recPowt = false;
+            
             // wybierz pierwsza z i-tej linijki (tab[i][0])
             int a = tab[i][0];
             // sprawdzamy czy a bylo juz wybrane
             if (powt[a + 1000]) {
                 wybierzLiczby(i + 1);
+                recPowt = true;
             } else if (!powt[-a + 1000]) {
                 wybrane[t] = a;
                 t++;
@@ -96,7 +101,7 @@ public class Main {
             int b = tab[i][1];
 
             if (powt[b + 1000]) {
-                wybierzLiczby(i + 1);
+                if(!recPowt) wybierzLiczby(i + 1);
             } else if (!powt[-b + 1000]) {
                 wybrane[t] = b;
                 t++;
@@ -107,17 +112,27 @@ public class Main {
             }//else if
 
         } else {
-            for (int j = 0; j < t; j++) {
-                System.out.print(String.format("%3d", wybrane[j]) + " ");
-            }//for
-            System.out.println("  0");
+            // zapisz zbior wybranych elementow
+            HashSet<Integer> set = new HashSet<>(); // utworz nowy zbior (HashSet)
+            for (int j = 0; j < t; j++) set.add(wybrane[j]); // dodaj wybrane elementy
+            zbiorWybranych.add(set); // dodaj do wybranych zbiorow (jesli byl juz taki zbior - nie zostanie dodany)
         }//else
     }//public void wybierzLiczby
 
+    private void wypiszWybrane(){
+        System.out.println("Wybrane liczby:");
+        for(HashSet<Integer> hs : zbiorWybranych){
+            for (int j : hs) {
+                System.out.print(String.format("%3d", j) + " ");
+            }//for
+            System.out.println("  0");
+        }
+    }
+    
     // funkcja main - START programu
     public static void main(String[] args) {
         Main program = new Main();
-
+        
         if (args.length == 0) {
             program.loadData();
             //obsluga argumentow programu
@@ -133,8 +148,8 @@ public class Main {
 
         program.initData();
         program.printData();
-        System.out.println("Wybrane liczby:");
         program.wybierzLiczby(0);
+        program.wypiszWybrane();
     }//public static void main
 }//public class Main    
 

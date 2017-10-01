@@ -14,8 +14,9 @@ public class Graf {
         List<Integer> krawedzie = new ArrayList<>();
     }
     // --- skladowe klasy Graf
-    private static int SIZE = 1000;
+    private static final int SIZE = 100000;
     private final Wezel wezly[];
+    private int maksymalnaZmienna;
 
     // --- konstruktor
     private Graf() {
@@ -23,6 +24,7 @@ public class Graf {
         for (int i = 0; i < SIZE; ++i) {
             this.wezly[i] = new Wezel();
         }
+        maksymalnaZmienna = 0;
     }
 
     // --- funkcje prywatne
@@ -30,10 +32,11 @@ public class Graf {
         wezly[a].krawedzie.add(b);
         wezly[a].uzywany = true;
         wezly[b].uzywany = true;
+        maksymalnaZmienna = Math.max(maksymalnaZmienna, Math.max(a, b));
     }
 
     private void porzadkujKrawedzie() {
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 1; i <= maksymalnaZmienna; i++) {
             TreeSet<Integer> bezDuplikatow = new TreeSet<>(wezly[i].krawedzie);
             wezly[i].krawedzie = new ArrayList<>(bezDuplikatow);
         }
@@ -43,7 +46,7 @@ public class Graf {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < SIZE; i++) {
+        for (int i = 1; i <= maksymalnaZmienna; i++) {
             if (wezly[i].krawedzie.isEmpty()) {
                 continue;
             }
@@ -57,31 +60,32 @@ public class Graf {
     }
 
     public String getOsiagalnoscCNF(int x, int y) {
+        int liczbaKlauzul = 0;
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < SIZE; i++) {
-            if (wezly[i].krawedzie.isEmpty()) {
-                continue;
-            }
-            sb.append(String.format("%3d", -i));
+        for (int i = 1; i <= maksymalnaZmienna; i++) {
+            if (wezly[i].krawedzie.isEmpty()) continue;
             for (int to : wezly[i].krawedzie) {
-                sb.append(String.format(" %3d", to));
+                sb.append(String.format("%3d %3d %3d\n",-i, to, 0));
+                ++liczbaKlauzul;
             }
-            sb.append("  0\n");
         }
-        sb.append(String.format("%3d  0\n", x));
-        sb.append(String.format("%3d  0\n", -y));
-        return sb.toString();
+        sb.append(String.format("%3d %3d\n", x,0));
+        ++liczbaKlauzul;
+        sb.append(String.format("%3d %3d\n",-y,0));
+        ++liczbaKlauzul;
+
+        String naglowek = String.format("p cnf %d %d\n", maksymalnaZmienna, liczbaKlauzul);
+        return naglowek + sb.toString();
     }
 
-    public String getCyklCNF(int x, int y) {
+    public String getCyklCNF(int start) {
+        int liczbaKlauzul = 0;
         List<Integer> bezNastepnika = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < SIZE; i++) {
-            if (!wezly[i].uzywany) // jesli nie uzywany, przegladaj dalej
-            {
-                continue;
-            }
+
+        for (int i = 1; i <= maksymalnaZmienna; i++) {
+            if (!wezly[i].uzywany) continue; // jesli nie uzywany, przegladaj dalej
             if (wezly[i].krawedzie.isEmpty()) { // nie ma krawedzi wychodzacych
                 bezNastepnika.add(i); // zapamietaj
             } else { // jesli ma krawedzie - wypisz formule
@@ -89,15 +93,19 @@ public class Graf {
                 for (int to : wezly[i].krawedzie) {
                     sb.append(String.format(" %3d", to));
                 }
-                sb.append("  0\n");
+                sb.append(String.format(" %3d\n", 0));
+                ++liczbaKlauzul;
             }
         }
         for (int i : bezNastepnika) {
-            sb.append(String.format("%3d  0\n", -i)); // dodaj negacje
+            sb.append(String.format("%3d %3d\n", -i, 0)); // dodaj negacje
+            ++liczbaKlauzul;
         }
-        sb.append(String.format("%3d  0\n", x));
-        sb.append(String.format("%3d  0\n", -y));
-        return sb.toString();
+        sb.append(String.format("%3d %3d\n", start, 0));
+        ++liczbaKlauzul;
+
+        String naglowek = String.format("p cnf %d %d\n", maksymalnaZmienna, liczbaKlauzul);
+        return naglowek + sb.toString();
     }
 
     // ------------- Konstrukcja

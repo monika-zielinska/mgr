@@ -2,7 +2,6 @@ package app;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.text.Format;
 import java.text.NumberFormat;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -26,6 +25,9 @@ public class LosujGrafDialog extends javax.swing.JDialog {
      */
     public LosujGrafDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        
+        numFormat = NumberFormat.getIntegerInstance();
+        numFormat.setGroupingUsed(false);
         initComponents();
 
         // Close the dialog when Esc is pressed
@@ -225,5 +227,5 @@ public class LosujGrafDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     private int returnStatus = RET_CANCEL;
-    private static Format numFormat = NumberFormat.getIntegerInstance();
+    private final NumberFormat numFormat;
 }

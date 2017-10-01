@@ -1,12 +1,17 @@
 package app;
 
 import java.text.NumberFormat;
+import javax.swing.JFileChooser;
 
 public class MainFrame extends javax.swing.JFrame {
 
     public MainFrame() {
+        intFormat = NumberFormat.getIntegerInstance();
+        intFormat.setGroupingUsed(false);
+        
         initComponents();
-        appLogic = new GrafAnalizer();
+        this.wybierzPlik = new JFileChooser();
+        this.appLogic = new GrafAnalizer();
     }
     
     // funkcje zmieniajace wyswietlenie - operacje w okienku
@@ -16,6 +21,8 @@ public class MainFrame extends javax.swing.JFrame {
         cyklButton.setEnabled(true);
         odField.setEnabled(true);
         doField.setEnabled(true);
+        startField.setEnabled(true);
+        zapiszButton.setEnabled(true);
     }
     
     void wyswietlGraf(){
@@ -29,9 +36,9 @@ public class MainFrame extends javax.swing.JFrame {
         infoField.setText(String.format("Formuła CNF: osiagalność dla (%d -> %d)", odStanu, doStanu));
     }
 
-    void wyswietlCyklCNF(int odStanu, int doStanu){
-        mainTextArea.setText(appLogic.wyswietlCyklCNF(odStanu, doStanu));
-        infoField.setText(String.format("Formuła CNF: cykl dla (%d -> %d)", odStanu, doStanu));
+    void wyswietlCyklCNF(int odStanu){
+        mainTextArea.setText(appLogic.wyswietlCyklCNF(odStanu));
+        infoField.setText(String.format("Formuła CNF: cykl od stanu %d", odStanu));
     }
     
     // ---------------------------
@@ -56,11 +63,13 @@ public class MainFrame extends javax.swing.JFrame {
         analizujPanel = new javax.swing.JPanel();
         analizujLabel = new javax.swing.JLabel();
         osiagalnoscButton = new javax.swing.JButton();
-        odField = new javax.swing.JFormattedTextField(NumberFormat.getIntegerInstance());
-        doField = new javax.swing.JFormattedTextField(NumberFormat.getIntegerInstance());
+        odField = new javax.swing.JFormattedTextField(intFormat);
+        doField = new javax.swing.JFormattedTextField(intFormat);
         doLabel = new javax.swing.JLabel();
         odLabel = new javax.swing.JLabel();
         cyklButton = new javax.swing.JButton();
+        startField = new javax.swing.JFormattedTextField(intFormat);
+        startLabel = new javax.swing.JLabel();
         infoField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -86,10 +95,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        grafLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         grafLabel.setText("Graf");
 
         wgrajGrafButton.setText("Wgraj");
-        wgrajGrafButton.setEnabled(false);
+        wgrajGrafButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                wgrajGrafButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout grafEditPanelLayout = new javax.swing.GroupLayout(grafEditPanel);
         grafEditPanel.setLayout(grafEditPanelLayout);
@@ -106,7 +120,7 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(wgrajGrafButton))
                     .addComponent(losujGrafButton))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 34, Short.MAX_VALUE))
         );
         grafEditPanelLayout.setVerticalGroup(
             grafEditPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -157,26 +171,40 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        startField.setEnabled(false);
+
+        startLabel.setText("start");
+
         javax.swing.GroupLayout analizujPanelLayout = new javax.swing.GroupLayout(analizujPanel);
         analizujPanel.setLayout(analizujPanelLayout);
         analizujPanelLayout.setHorizontalGroup(
             analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(analizujPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(analizujLabel)
-                    .addComponent(osiagalnoscButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, analizujPanelLayout.createSequentialGroup()
-                            .addComponent(doLabel)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(doField))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, analizujPanelLayout.createSequentialGroup()
-                            .addComponent(odLabel)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(odField, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(cyklButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(analizujPanelLayout.createSequentialGroup()
+                        .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(analizujLabel)
+                            .addGroup(analizujPanelLayout.createSequentialGroup()
+                                .addComponent(odLabel)
+                                .addGap(4, 4, 4)
+                                .addComponent(odField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(4, 4, 4)
+                                .addComponent(doLabel)
+                                .addGap(4, 4, 4)
+                                .addComponent(doField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(analizujPanelLayout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(startLabel)
+                        .addGap(4, 4, 4)
+                        .addComponent(startField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(analizujPanelLayout.createSequentialGroup()
+                .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(osiagalnoscButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cyklButton, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         analizujPanelLayout.setVerticalGroup(
             analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -184,17 +212,19 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(analizujLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(osiagalnoscButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cyklButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(odField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(odLabel))
+                    .addComponent(odLabel)
+                    .addComponent(doLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(doField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cyklButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(doField)
-                    .addComponent(doLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGroup(analizujPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(startLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(startField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(37, 37, 37))
         );
 
         infoField.setEditable(false);
@@ -214,7 +244,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(grafEditPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(analizujPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(analizujPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -222,13 +252,14 @@ public class MainFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(infoField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(zapiszButton))
             .addGroup(layout.createSequentialGroup()
-                .addComponent(grafEditPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(analizujPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(grafEditPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(analizujPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -248,7 +279,17 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_nowyGrafButtonActionPerformed
 
     private void zapiszButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zapiszButtonActionPerformed
-        // TODO add your handling code here:
+        // wyswietl wybieranie pliku
+        int rVal = wybierzPlik.showOpenDialog(this);
+        if (rVal == JFileChooser.APPROVE_OPTION) { // wybrany
+            String sciezka = wybierzPlik.getSelectedFile().getPath();
+            System.out.println("Zapis do " + sciezka);
+            if(appLogic.zapiszTekstDoPliku(mainTextArea.getText(), sciezka)){
+                infoField.setText("Zapisano do pliku: " + wybierzPlik.getSelectedFile().getName());
+            }
+        } else if(rVal == JFileChooser.CANCEL_OPTION) {
+            System.out.println("cancel");
+        }
     }//GEN-LAST:event_zapiszButtonActionPerformed
 
     private void osiagalnoscButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_osiagalnoscButtonActionPerformed
@@ -273,10 +314,24 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void cyklButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cyklButtonActionPerformed
         System.out.println("Cykl");
-        int odStanu = Integer.parseInt(odField.getText());
-        int doStanu = Integer.parseInt(doField.getText());
-        wyswietlCyklCNF(odStanu, doStanu);
+        int odStanu = Integer.parseInt(startField.getText());
+        wyswietlCyklCNF(odStanu);
     }//GEN-LAST:event_cyklButtonActionPerformed
+
+    private void wgrajGrafButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wgrajGrafButtonActionPerformed
+        // wyswietl wybieranie pliku
+        int rVal = wybierzPlik.showOpenDialog(this);
+        if (rVal == JFileChooser.APPROVE_OPTION) { // wybrany
+            String sciezka = wybierzPlik.getSelectedFile().getPath();
+            System.out.println("Wczytaj graf z: " + sciezka);
+            if(appLogic.nowyGrafzPliku(sciezka)){
+                wyswietlGraf();
+                infoField.setText("Wczytano z pliku: " + wybierzPlik.getSelectedFile().getName());
+            }
+        } else if(rVal == JFileChooser.CANCEL_OPTION) {
+            System.out.println("cancel");
+        }
+    }//GEN-LAST:event_wgrajGrafButtonActionPerformed
 
     // ------------ Uruchomienie
     
@@ -332,7 +387,11 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField odField;
     private javax.swing.JLabel odLabel;
     private javax.swing.JButton osiagalnoscButton;
+    private javax.swing.JTextField startField;
+    private javax.swing.JLabel startLabel;
     private javax.swing.JButton wgrajGrafButton;
     private javax.swing.JButton zapiszButton;
     // End of variables declaration//GEN-END:variables
+    private final JFileChooser wybierzPlik;
+    private final NumberFormat intFormat;
 }
